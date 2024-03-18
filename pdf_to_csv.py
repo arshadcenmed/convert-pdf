@@ -1,10 +1,10 @@
-import fitz  # PyMuPDF
+import pdfplumber
 import pandas as pd
 import streamlit as st
 
 def convert_pdf_to_csv(pdf_file):
     """
-    Converts a PDF file to a CSV file using PyMuPDF to extract text.
+    Converts a PDF file to a CSV file using pdfplumber to extract text.
 
     Parameters:
     pdf_file (UploadedFile): The PDF file uploaded by the user.
@@ -12,22 +12,20 @@ def convert_pdf_to_csv(pdf_file):
     Returns:
     None: Writes the CSV file to the disk.
     """
-    # Open the PDF file
-    doc = fitz.open(stream=pdf_file.read(), filetype="pdf")
-    
-    # Initialize a text placeholder
-    all_text = []
+    # Initialize a list to hold all extracted text
+    text_list = []
 
-    # Extract text from each page of the PDF
-    for page in doc:
-        text = page.get_text()
-        all_text.append(text)
+    # Use pdfplumber to open and read the PDF file
+    with pdfplumber.open(pdf_file) as pdf:
+        # Extract text from each page
+        for page in pdf.pages:
+            text = page.extract_text()
+            # For simplicity, we're appending the text of each page into a list
+            # You might need to process the text into a structured format
+            text_list.append(text if text else "Page was blank")
     
-    # Close the document
-    doc.close()
-
-    # Convert list of text to DataFrame
-    df = pd.DataFrame(all_text, columns=['Text'])
+    # Convert the list of text into a DataFrame
+    df = pd.DataFrame(text_list, columns=['Text'])
 
     # Save DataFrame to CSV
     csv_file = pdf_file.name.replace('.pdf', '.csv')
