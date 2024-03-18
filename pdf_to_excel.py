@@ -1,10 +1,10 @@
 import pandas as pd
 import streamlit as st
-from utils import extract_text_from_pdf
+from tabula import read_pdf
 
 def convert_pdf_to_excel(pdf_file):
     """
-    Converts a PDF file to an Excel file.
+    Converts a PDF file to an Excel file using tabula to extract tables.
 
     Parameters:
     pdf_file (UploadedFile): The PDF file uploaded by the user.
@@ -12,11 +12,11 @@ def convert_pdf_to_excel(pdf_file):
     Returns:
     None: Writes the Excel file to the disk.
     """
-    # Extract text from PDF
-    extracted_text = extract_text_from_pdf(pdf_file)
+    # Use tabula to read tables from PDF
+    df_list = read_pdf(pdf_file, pages='all', multiple_tables=True, lattice=True, stream=True)
 
-    # Convert extracted text to DataFrame
-    df = pd.DataFrame([extracted_text], columns=['Text'])
+    # Assuming you want to concatenate all tables found into a single DataFrame
+    df = pd.concat(df_list, ignore_index=True)
 
     # Save DataFrame to Excel
     excel_file = pdf_file.name.replace('.pdf', '.xlsx')
