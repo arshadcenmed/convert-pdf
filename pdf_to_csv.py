@@ -2,6 +2,7 @@ import PyPDF2
 import pandas as pd
 import io
 from utils import extract_text_from_pdf
+import streamlit as st
 
 def convert_pdf_to_csv(pdf_file):
     """
